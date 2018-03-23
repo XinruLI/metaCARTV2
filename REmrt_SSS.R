@@ -1,26 +1,6 @@
-rebetQ<- function(yi, vi, mods){
-  wts = 1/vi
-  wy = wts*yi
-  wy2 = wts * yi^2
-  Q <- tapply(wy2, mods, sum) - tapply(wy, mods, function(x) (sum(x))^2)/tapply(wts, mods, sum)
-  df <- tapply(wy, mods, length)-1
-  C <- tapply(wts, mods, sum) - tapply(wts, mods, function(x) sum(x^2))/ tapply(wts, mods, sum)
-  tau2 <- (sum(Q) - sum(df))/sum(C)
-  tau2 <- max(0, tau2)
-  wstar = 1/(vi+tau2)
-  wystar = wstar*yi
-  wy2star = wstar*yi^2
-  Qstar <- tapply(wy2star, mods, sum) - tapply(wystar, mods, function(x) (sum(x))^2)/tapply(wstar, mods, sum)
-  Qstar.total <- sum(wy2star) - (sum(wystar))^2/sum(wstar)
-  Qbet <- Qstar.total - sum(Qstar)
-  if (is.na(Qbet)) {
-    Qbet <- Inf
-  }
-  return(c(Qbet, tau2))
-  
-}
+# THE SSS FUNCTION
 expit <- function(x) (tanh(x/2)+1)/2  	# CORRECT & VERIFIED
-#THE SSS FUNCTION FOR QB WITH GLOBAL TAU2 
+# THE SSS FUNCTION TO COMPUTE QB WITH GLOBAL TAU2 
 REbetQ.ord <- function(c, a = 50, x, g, vi, cnode, pl) {
   # Arguments:
   # c: the split point
@@ -58,8 +38,28 @@ REbetQ.ord <- function(c, a = 50, x, g, vi, cnode, pl) {
   q.total <- sum((g-g.mu)^2*wts)
   return(q.within-q.total)
 }
-#REbetQ.ord(c.star, 50, xk, y, vi, cnode, pl)
-
+rebetQ<- function(yi, vi, mods){
+  wts = 1/vi
+  wy = wts*yi
+  wy2 = wts * yi^2
+  Q <- tapply(wy2, mods, sum) - tapply(wy, mods, function(x) (sum(x))^2)/tapply(wts, mods, sum)
+  df <- tapply(wy, mods, length)-1
+  C <- tapply(wts, mods, sum) - tapply(wts, mods, function(x) sum(x^2))/ tapply(wts, mods, sum)
+  tau2 <- (sum(Q) - sum(df))/sum(C)
+  tau2 <- max(0, tau2)
+  wstar = 1/(vi+tau2)
+  wystar = wstar*yi
+  wy2star = wstar*yi^2
+  Qstar <- tapply(wy2star, mods, sum) - tapply(wystar, mods, function(x) (sum(x))^2)/tapply(wstar, mods, sum)
+  Qstar.total <- sum(wy2star) - (sum(wystar))^2/sum(wstar)
+  Qbet <- Qstar.total - sum(Qstar)
+  if (is.na(Qbet)) {
+    Qbet <- Inf
+  }
+  return(c(Qbet, tau2))
+  
+}
+# FIND THE SPLIT POINT BY MAXIMIZING QB
 bestcut.ord <- function(x, g, vi, a=NULL,
                         cnode, pl,
                         alpha.endcut=.02,
@@ -103,42 +103,6 @@ bestcut.ord <- function(x, g, vi, a=NULL,
   cstar <- cstar*sigma + mu # TRANSFORM BACK
   return(cstar)
 }
-REmrtD <- function(formula, data, vi, c = 1, maxL = 5L, minsplit = 2L, delQ = 0.001, minbucket = 3, n.fold = 10, lookahead = FALSE, ...){
-  Call <- match.call()
-  indx <- match(c("formula", "data", "vi"),
-                names(Call), nomatch = 0L)
-  if (indx[1] == 0L)
-    stop("a 'formula' argument is required")
-  if (indx[3] == 0L)
-    stop("The sampling variances need to be specified")
-  if (!is.logical(lookahead))
-    stop("The 'lookahead' argument needs to be a logical value")
-  if (maxL < 2 & (lookahead == TRUE) )
-    stop("The 'maxL' should be at least 2 when applying look-ahead strategy")
-  temp <- Call[c(1L, indx)]
-  temp[[1L]] <- quote(stats::model.frame)
-  mf <- eval.parent(temp)
-  mf}
-
-
-# Simulate some new data sets
-library(metacart)
-dat <- SimData # a simulated data set: effect size is the highest
-# when m1,m2,m3 are all equal to B
-# Generate a new ordinal moderator so that the effect size is higher
-# when x is no less than 4
-inx <- (SimData$m2 == "B")
-set.seed(2018)
-x.test <- sample(-30:60, 120, replace = TRUE)
-x.test[which(inx == 1)] <- sample(61:70, sum(inx), replace = TRUE)
-x = x.test
-dat$m2 <- x
-y <- dat$efk
-vi <- dat$vark
-mods <- dat[ ,4:8]
-mods.names <- names(mods)
-
-mf <- REmrtD(efk ~ m1 + m2 + m3 + m4 + m5, data = dat, vi, c = 1, maxL = 5L, minsplit = 2L, delQ = 0.001, minbucket = 3, n.fold = 10, lookahead = FALSE)
 # THE FUNCTION TO FIT RE META-CART USING SSS STRATEGY
 REmrt.SSS0 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
   y <- model.response(mf)
@@ -170,7 +134,7 @@ REmrt.SSS0 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
         } else {
           #----------------------DICHOTOMOUS MODERATOR-------------------------#
           if (length(c.splits) == 2) { 
-            c.star = sort(xk)[1]
+            c.star <- sort(xk)[1]
             cnode.tmp <- cnode
             cnode.tmp[pleaf.inx] <- ifelse( xk == c.star, 2*i, 2*i+1)
             if (min(table(cnode.tmp[pleaf.inx])) <= minbucket) {
@@ -204,7 +168,7 @@ REmrt.SSS0 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
               if (Dev.new > Dev) {
                 Dev <- temp[1]
                 tcpt <- c.star
-                msplit <- paste(mods.names[k], "<", tcpt, collapse = " ")
+                msplit <- paste(mods.names[k], "<=", tcpt, collapse = " ")
                 tres <- data.frame(Qb = temp[1], tau2 = temp[2],
                                    split = msplit, mod = mods.names[k], pleaf = as.numeric(nodes[j]))
                 tnode <- cnode.tmp
@@ -219,7 +183,7 @@ REmrt.SSS0 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
               c.star <- bestcut.ord(x = xk.ord, a = 50, g= y, vi=vi, 
                                     cnode = cnode, pl = pl)
               cnode.tmp <- cnode
-              cnode.tmp[pleaf.inx] <- ifelse( xk.ord < c.star, 2*i, 2*i+1)
+              cnode.tmp[pleaf.inx] <- ifelse( xk.ord <= c.star, 2*i, 2*i+1)
               if (min(table(cnode.tmp[pleaf.inx])) <= minbucket) {
                 Dev.new <- -Inf
               } else {
@@ -258,5 +222,4 @@ REmrt.SSS0 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
   
   
 }
-system.time(REmrt.SSS0(mf, 5, 2,2,0.0001,FALSE))
-# system.time(REmrt.fit0(mf, 5, 2,2,0.0001,FALSE)) = 0.341
+
