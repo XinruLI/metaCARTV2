@@ -75,11 +75,12 @@ PreData <- function(formula, data, vi, c = 1, maxL = 5L, minsplit = 2L, delQ = 0
   mf <- eval.parent(temp)
   mf
 }
-set.seed(207)
+set.seed(67)
 K <- 80
 n <- 80
 
 source("REmrt_GS_update.R")
+source("REmrtGS_cpp.R")
 source("REmrt0.R")
 # The same for both K = 20/80
 gamma <- 0
@@ -95,8 +96,8 @@ for (i in 1:200) {
   dat.sim1 <- SimData(c(0,0.8), mods, "~ m1:m2:m3", K, NumGen(n,K), 0)
   dat.sim1 <- data.frame(dat.sim1, x1, x2, x3, x4 , x5)
   mf <- PreData(efk~x1+x2+x3+x4+x5, dat.sim1, vi = vark)
-  res.up <- REmrt_GS(mf, maxL = 5, minbucket=5, minsplit=6, delQ=5, lookahead=F)
-  res0 <- REmrt.fit0(mf, maxL = 5, minbucket=5, minsplit=6, delQ=5, lookahead=F) 
+  res.up <- REmrt_GS_cpp(mf, maxL = 10, minbucket=5, minsplit=6, delQ=5, lookahead=F)
+  res0 <- REmrt.fit0(mf, maxL = 10, minbucket=5, minsplit=6, delQ=5, lookahead=F) 
   if (all.equal(res.up$tree$Qb, res0$tree$Qb)) {
     gamma <- gamma + 1
   } else {
@@ -104,6 +105,10 @@ for (i in 1:200) {
   }
 }
 
+system.time(REmrt_GS_cpp(mf, maxL = 10, minbucket=5, minsplit=6, delQ=5, lookahead=F))
+system.time(REmrt_GS(mf, maxL = 10, minbucket=5, minsplit=6, delQ=5, lookahead=F))
+system.time(REmrt.fit0(mf, maxL = 10, minbucket=5, minsplit=6, delQ=5, lookahead=F))
+# 0.055 compared to 0.297, to 0.592
 res0$tree
 res.up$tree
 k <- 2
@@ -115,7 +120,7 @@ minb <- numeric(200)
 source("REmrt_GS_update.R")
 K <- 20
 n <- 80
-for (i in 1:50) {
+for (i in 1:200) {
   print(i)
   x1 <- rnorm(K)
   x2 <- sample(letters[1:5], K, replace = TRUE)
@@ -127,7 +132,7 @@ for (i in 1:50) {
   dat.sim1 <- SimData(c(0,0.8), mods, "~ m1:m2:m3", K, NumGen(n,K), 0)
   dat.sim1 <- data.frame(dat.sim1, x1, x2, x3, x4 , x5)
   mf <- PreData(efk~x1+x2+x3+x4+x5, dat.sim1, vi = vark)
-  res.up <- REmrt_GS(mf, maxL = 100, minbucket=5, minsplit=6, delQ=0, lookahead=F)
+  res.up <- REmrt_GS_cpp(mf, maxL = 100, minbucket=5, minsplit=6, delQ=0, lookahead=F)
   minb[i] <- min(table(res.up$node.split[ ,nrow(res.up$tree)]))
 }
 minb
