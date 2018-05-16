@@ -1,8 +1,16 @@
-source("GSupdate_Cpp.R")
-# TO DO:
-# ADD CHECK minsplit SHOULD BE LARGER THAN minbucket
-# THE minsplit should be larger than 2?
+#' A function to fit the tree with look-ahead option
+#'
+#' @param mf the data.frame to grow the tree
+#' @param maxL the maximum number of splits
+#' @param minbucket the minimum number of the studies in a terminal node
+#' @param minsplit the minimal number of studies in a parent node to be split
+#' @param delQ the stopping rule for decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.
+#' @param lookahead an argument indicating whether to apply the "look-ahead" strategy when fitting the tree
+#' @return a list including a tree, the split points, the data, and the nodes after each split
+#' @keywords internal
+#' @importFrom stats terms model.response
 REmrt_GS_cpp <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
+  if(minbucket >= minsplit) stop("minbucket should be smaller than minsplit")
   y <- model.response(mf)
   vi <- c(t(mf["(vi)"]))
   mods.names <-  labels(terms(mf))
@@ -31,7 +39,7 @@ REmrt_GS_cpp <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
         if (length(c.splits) < 2) next
         if (is.numeric(xk)) {
           # NUMERIC VARIABLE
-          temp <- re.cutoff.cpp(y, vi, xk, pleaf.inx, cnode, minbucket)
+          temp <- re.cutoff_cpp(y, vi, xk, pleaf.inx, cnode, minbucket)
           if (is.null(temp)) {
             Dev.new <- -Inf
           } else {
@@ -52,7 +60,7 @@ REmrt_GS_cpp <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
         } else {
           xk.rank <- rank(tapply(y[pleaf.inx], xk, mean))
           xk.ordinal <- xk.rank[as.character(xk)]
-          temp <- re.cutoff.cpp(y, vi, xk.ordinal, pleaf.inx, cnode, minbucket)
+          temp <- re.cutoff_cpp(y, vi, xk.ordinal, pleaf.inx, cnode, minbucket)
           if (is.null(temp)) {
             Dev.new <- -Inf
           } else {
@@ -100,7 +108,7 @@ REmrt_GS_cpp <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
         if (length(c.splits) < 2) next
         if (is.numeric(xk)) {
           # NUMERIC VARIABLE
-          temp <- re.cutoff.cpp(y, vi, xk, pleaf.inx, cnode, minbucket)
+          temp <- re.cutoff_cpp(y, vi, xk, pleaf.inx, cnode, minbucket)
           if (is.null(temp)) {
             Dev.new <- -Inf
           } else {
@@ -121,7 +129,7 @@ REmrt_GS_cpp <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
         } else {
           xk.rank <- rank(tapply(y[pleaf.inx], xk, mean))
           xk.ordinal <- xk.rank[as.character(xk)]
-          temp <-  re.cutoff.cpp(y, vi, xk.ordinal, pleaf.inx, cnode, minbucket)
+          temp <-  re.cutoff_cpp(y, vi, xk.ordinal, pleaf.inx, cnode, minbucket)
           if (is.null(temp)) {
             Dev.new <- -Inf
           } else {
@@ -149,7 +157,7 @@ REmrt_GS_cpp <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
     }
     
   }
-  list(tree = data.frame(Qb = res.Qb, tau2 = res.tau2, split = res.split,
+  list(tree = data.frame(Qb = res.Qb, tau2 = res.tau2, split = as.character(res.split),
                          mod = res.mod, pleaf = res.pleaf),
        node.split = nodemark, cpt = cpt, data = mf)
   

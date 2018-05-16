@@ -16,7 +16,7 @@ REmrt.prednode_cpp <- function(x, newdata) {
   nameM <- 1:ncol(new.ms)
   names(nameM) <- colnames(new.ms)
   inxM <- nameM[tree$mod]
-  boolName <- sapply(old.ms, is.numeric)
+  boolName <- sapply(old.ms, is.numeric) # tell if a moderator is numeric
   names(boolName) <- colnames(old.ms)
   boolNumeric <- boolName[tree$mod]
   partition(tree, new.ms, boolNumeric, inxM, x$cpt, old.ms)

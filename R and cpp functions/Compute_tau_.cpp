@@ -12,6 +12,7 @@ NumericVector compute_tau_(NumericVector x1,NumericVector x2,
   // x4 is the sorted effect size in the parent leaf
   // x5 is the sorted sampling variance in the parent leaf
   
+  //===============The estimate in the other leaves=================//
   int i;
   double sumQoleaf = 0;
   double sumColeaf = 0;
@@ -34,6 +35,7 @@ NumericVector compute_tau_(NumericVector x1,NumericVector x2,
     sumColeaf = sumColeaf + tempW2/tempW;
     sWoleaf = sWoleaf + tempW;
   }
+  //===============The estimate in the child leaves=================//
   NumericVector wy;
   NumericVector wy2;
   NumericVector wts;
