@@ -1,0 +1,16 @@
+#' Predictions from a fitted metacart object
+#'
+#' Returns a data frame of predicted effect sizes and moderators from a fitted metacart object
+#'
+#' @param object fitted model object of class "REmrt".
+#' @param newdata data frame containing the values at which predictions are required.
+#' @param ... Arguments that pass to other methods.
+#' @return  A data frame containing the predicted effect size, the moderators, and the corresponding node lables in the fitted tree.
+#' @importFrom stats as.formula delete.response model.frame model.response terms predict
+#' @export
+predict.REmrt <- function(object, newdata, ...){
+  allNodes <- prednode_cpp(object, newdata)
+  TNodes <- allNodes[, ncol(allNodes)] 
+  pred.g <- object$g[as.character(TNodes)]
+  cbind(newdata, TNodes, pred.g)
+}
