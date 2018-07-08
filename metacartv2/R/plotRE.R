@@ -86,7 +86,7 @@ plot.REmrt <- function(x, ...){
     }
     # Add split conditions
     nodes$split = NA
-    nodes$split[tree$pleaf] = tree$split
+    nodes$split[tree$pleaf] = as.character(tree$split)
 
     # Second, find the new x.coordinates
     nodes$x.new <- rep(NA, nrow(nodes))

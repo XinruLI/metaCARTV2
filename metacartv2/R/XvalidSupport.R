@@ -12,10 +12,10 @@ prednode_cpp <- function(x, newdata) {
   tree <- x[["tree"]]
   nameM <- 1:ncol(new.ms)
   names(nameM) <- colnames(new.ms)
-  inxM <- nameM[tree$mod]
+  inxM <- nameM[as.character(tree$mod)]
   boolName <- sapply(old.ms, is.numeric) # tell if a moderator is numeric
   names(boolName) <- colnames(old.ms)
-  boolNumeric <- boolName[tree$mod]
+  boolNumeric <- boolName[as.character(tree$mod)]
   partition(tree, new.ms, boolNumeric, inxM, x$cpt, old.ms)
 }
 
