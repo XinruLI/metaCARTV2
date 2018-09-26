@@ -1,5 +1,3 @@
-# round the number for the $split in the returned tree frame
-
 #' Random effects meta-tree
 #'
 #'A function to fit a random effects meta-tree
@@ -67,7 +65,7 @@ REmrt <- function(formula, data, vi, c = 1, maxL = 5L, minsplit = 5L, cp = 1e-5,
   mf <- eval.parent(temp)
   
 #---    use x-validation to decide the size of the tree    ---#
-  cv.res <- Xvalid_all(REmrt_GS_cpp2, mf, maxL = maxL, n.fold = n.fold, minbucket = minbucket, minsplit = minsplit, cp = cp, lookahead = lookahead)
+  cv.res <- Xvalid_all(REmrt_GS_, mf, maxL = maxL, n.fold = n.fold, minbucket = minbucket, minsplit = minsplit, cp = cp, lookahead = lookahead)
   mindex <- which.min(cv.res[, 1])
   cp.minse <- cv.res[mindex,1] + c*cv.res[mindex,2]
   cp.row <- min(which(cv.res[,1]<= cp.minse))
@@ -99,7 +97,7 @@ REmrt <- function(formula, data, vi, c = 1, maxL = 5L, minsplit = 5L, cp = 1e-5,
   } else{  
     y <- model.response(mf)
     vi <- c(t(mf["(vi)"]))
-    res <- REmrt_GS_cpp2(mf, maxL = maxL, minsplit = minsplit, cp = cp, minbucket = minbucket, lookahead = lookahead)
+    res <- REmrt_GS_(mf, maxL = maxL, minsplit = minsplit, cp = cp, minbucket = minbucket, lookahead = lookahead)
     prunedTree <- res$tree[1:cp.row, ]
     tau2 <- res$tree$tau2[cp.row]
     vi.star <- vi + tau2

@@ -5,22 +5,6 @@
 
 using namespace Rcpp;
 
-// compute_tau_
-NumericVector compute_tau_(NumericVector x1, NumericVector x2, NumericVector x3, NumericVector xuni, NumericVector x4, NumericVector x5);
-RcppExport SEXP _metacartv2_compute_tau_(SEXP x1SEXP, SEXP x2SEXP, SEXP x3SEXP, SEXP xuniSEXP, SEXP x4SEXP, SEXP x5SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x1(x1SEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type x2(x2SEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type x3(x3SEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type xuni(xuniSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type x4(x4SEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type x5(x5SEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_tau_(x1, x2, x3, xuni, x4, x5));
-    return rcpp_result_gen;
-END_RCPP
-}
 // compute_re_Q_
 NumericVector compute_re_Q_(NumericVector x1, NumericVector x2, NumericVector x3, NumericVector x4, NumericVector xuni, NumericVector x5, NumericVector x6);
 RcppExport SEXP _metacartv2_compute_re_Q_(SEXP x1SEXP, SEXP x2SEXP, SEXP x3SEXP, SEXP x4SEXP, SEXP xuniSEXP, SEXP x5SEXP, SEXP x6SEXP) {
@@ -35,6 +19,22 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type x5(x5SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type x6(x6SEXP);
     rcpp_result_gen = Rcpp::wrap(compute_re_Q_(x1, x2, x3, x4, xuni, x5, x6));
+    return rcpp_result_gen;
+END_RCPP
+}
+// compute_tau_
+NumericVector compute_tau_(NumericVector x1, NumericVector x2, NumericVector x3, NumericVector xuni, NumericVector x4, NumericVector x5);
+RcppExport SEXP _metacartv2_compute_tau_(SEXP x1SEXP, SEXP x2SEXP, SEXP x3SEXP, SEXP xuniSEXP, SEXP x4SEXP, SEXP x5SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x1(x1SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x2(x2SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x3(x3SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type xuni(xuniSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x4(x4SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x5(x5SEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_tau_(x1, x2, x3, xuni, x4, x5));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -109,8 +109,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_metacartv2_compute_tau_", (DL_FUNC) &_metacartv2_compute_tau_, 6},
     {"_metacartv2_compute_re_Q_", (DL_FUNC) &_metacartv2_compute_re_Q_, 7},
+    {"_metacartv2_compute_tau_", (DL_FUNC) &_metacartv2_compute_tau_, 6},
     {"_metacartv2_contain_", (DL_FUNC) &_metacartv2_contain_, 2},
     {"_metacartv2_partition", (DL_FUNC) &_metacartv2_partition, 6},
     {"_metacartv2_ComputeY", (DL_FUNC) &_metacartv2_ComputeY, 4},
