@@ -63,7 +63,7 @@ REmrt <- function(formula, data, vi, c = 1, maxL = 5L, minsplit = 5L, delQ = 1e-
   temp[[1L]] <- quote(stats::model.frame)
   mf <- eval.parent(temp)
   # use x-validation to decide the size of the tree
-  cv.res <- Xvalid_all(REmrt_GS_cpp, mf, maxL = maxL, n.fold = n.fold, minbucket = minbucket, minsplit = minsplit, delQ = delQ, lookahead = lookahead)
+  cv.res <- Xvalid_all(REmrt_GS_cpp2, mf, maxL = maxL, n.fold = n.fold, minbucket = minbucket, minsplit = minsplit, delQ = delQ, lookahead = lookahead)
   mindex <- which.min(cv.res[, 1])
   cp.minse <- cv.res[mindex,1] + c*cv.res[mindex,2]
   cp.row <- min(which(cv.res[,1]<= cp.minse))
@@ -95,7 +95,7 @@ REmrt <- function(formula, data, vi, c = 1, maxL = 5L, minsplit = 5L, delQ = 1e-
   } else{
     y <- model.response(mf)
     vi <- c(t(mf["(vi)"]))
-    res <- REmrt_GS_cpp(mf, maxL = cp.row - 1, minsplit = minsplit, delQ = delQ, minbucket = minbucket, lookahead = lookahead)
+    res <- REmrt_GS_cpp2(mf, maxL = cp.row - 1, minsplit = minsplit, delQ = delQ, minbucket = minbucket, lookahead = lookahead)
     depth <- nrow(res$tree)
     tau2 <- res$tree$tau2[depth]
     vi.star <- vi + tau2

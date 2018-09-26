@@ -4,7 +4,7 @@
 \alias{Xvalid_all}
 \title{A function to compute cross-validation errors}
 \usage{
-Xvalid_all(func, mf, maxL, n.fold, minbucket, minsplit, delQ, lookahead)
+Xvalid_all(func, mf, maxL, n.fold, minbucket, minsplit, cp, lookahead)
 }
 \arguments{
 \item{func}{the function used to fit the model}
@@ -19,7 +19,7 @@ Xvalid_all(func, mf, maxL, n.fold, minbucket, minsplit, delQ, lookahead)
 
 \item{minsplit}{the minimal number of studies in a parent node to be split}
 
-\item{delQ}{the stopping rule for decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.}
+\item{cp}{the stopping rule for decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.}
 
 \item{lookahead}{an argument indicating whether to apply the "look-ahead" strategy when fitting the tree}
 }

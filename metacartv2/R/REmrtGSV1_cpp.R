@@ -163,11 +163,3 @@ REmrt_GS_cpp <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
   
 }
 
-# res.up <- REmrt_GS(mf, maxL = 10, minbucket=3, minsplit=2, delQ=0.00001, lookahead=F)
-# system.time(res.up <- REmrt_GS(mf, maxL = 10, minbucket=3, minsplit=2, delQ=0.00001, lookahead=F) )
-# # 0.672
-# source("REmrt0.R")
-# system.time(
-# res0 <- REmrt.fit0(mf, maxL = 10, minbucket=3, minsplit=2, delQ=0.00001, lookahead=F) 
-# )
-# 0.917 

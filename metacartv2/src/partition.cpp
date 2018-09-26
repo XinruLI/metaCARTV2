@@ -5,7 +5,8 @@ using namespace Rcpp;
 //' 
 //' @param x1 a charactor vector
 //' @param x2 a charactor vector
-bool contain(CharacterVector x1, CharacterVector x2){
+// [[Rcpp::export]]
+bool contain_(CharacterVector x1, CharacterVector x2){
   return std::find(x1.begin(), x1.end(), x2[0]) != x1.end();
 }
 
@@ -56,11 +57,11 @@ IntegerMatrix partition(DataFrame x1, DataFrame x2,
           pnode[i] = 2*j;
           CharacterVector tempMod;
           tempMod.push_back(sv[i]);
-          if (!contain(tempModOld, tempMod)) {
+          if (!contain_(tempModOld, tempMod)) {
             pnode[i] = NA_REAL; // if a new category is observed 
             // in the test set, assign NA 
           } else {
-            if (!contain(tempSP, tempMod)) {
+            if (!contain_(tempSP, tempMod)) {
               pnode[i] = pnode[i]+1;
             }
           }

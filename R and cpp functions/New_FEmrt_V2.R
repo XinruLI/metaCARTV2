@@ -4,6 +4,8 @@
 #        add node number, remove msplit (since the data.frame is slow)
 #        add track of parents 
 load("/Users/xinruli/Documents/Meta-CART\ Projects/Meta-CART\ R-Package/The\ Package\ v2/R\ and\ cpp\ functions/mf")
+mf$vi <- mf[,5]
+REmrt(efk~x1+x2+x3, data = mf, vi = vi, minsplit = 2, minbucket = 1, cp = 0.001)
 
 FE.GS.cutoff <- function(yi, vi, xk, minbucket){
   n <- length(yi)

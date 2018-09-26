@@ -30,7 +30,7 @@ re.cutoff_cpp <- function(g, vi, x, inx.s, cnode, minbucket) {
     qb.star <- compute_re_Q_(g.left, vi.left, cnode.left,tau2,
                             unique(cnode.left), g.sort, vi.sort)
     inx.star <- which(qb.star ==  max(qb.star[c.split]))
-    cstar <- x.sort[inx.star]
+    cstar <- (x.sort[inx.star]+x.sort[inx.star+1])/2
     res <- c(cstar, qb.star[inx.star], tau2[inx.star])
     res
   }

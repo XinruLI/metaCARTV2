@@ -1,12 +1,38 @@
 # a FE to split the nodes based on depth
-
+# To do list: to add minsplit. and do something else other than storing the indication for every child leaves
 load("/Users/xinruli/Documents/Meta-CART\ Projects/Meta-CART\ R-Package/The\ Package\ v2/R\ and\ cpp\ functions/mf")
-FE.GS.cutoff <- function(yi, vi, xk){
+Find_Split_Point_FE <- function(yi, vi, xk, minbucket){
+  # given the moderator, the effecti size and the sampling variance
+  # find the best split point
+  # To do: add minbucekt and minsplit option
   n <- length(yi)
   xk.order <- order(xk)
   xk <- xk[xk.order]
   yi <- yi[xk.order]
   vi <- vi[xk.order]
+  c.split <- (xk[-1] - xk[-n]) != 0
+  if (minbucket > 1) {
+    c.split[c(1:(minbucket-1), (n-minbucket+1):(n-1))] <- FALSE
+  }
+  if (all(c.split == FALSE)) {
+    return(NULL)
+  } else {
+    wy <- yi / vi
+    wy2 <- yi^2 / vi
+    wts <- 1/vi
+    wts2 <- wts^2
+    cwy <- cumsum(wy[-n])
+    cwy2 <- cumsum(wy2[-n])
+    cwts <- cumsum(wts[-n])
+    cwts2 <- cumsum(wts2[-n])
+    Ql <- cwy2 - cwy^2/cwts
+    Qr <- sum(wy2) - cwy2 - (sum(wy) - cwy)^2/(sum(wts) - cwts)
+    Qrl <- Ql + Qr
+    inx.star <- which(Qrl ==  min(Qrl[c.split]))
+    res <- c((xk[inx.star]+xk[inx.star+1])/2, Ql[inx.star], Qr[inx.star])
+    names(res) <- c("c.star", "Ql", "Qr")
+    return(res)
+  }
   
   wy <- yi / vi
   wy2 <- yi^2 / vi
@@ -25,7 +51,15 @@ FE.GS.cutoff <- function(yi, vi, xk){
   return(res)
   
 }
-FE.split <- function(y, vi, mods, mod.types, node){
+FE.split <- function(y, vi, mods, mod.types, node, minbucekt){
+  # Given the effect size, the sampling variance, the data frame of 
+  # all moderators, whether the moderators are numeric, and a list 
+  # containing information about the parent leaves
+  # node is a list with each elements containing information of one
+  # parent leaf. So each element should be a list contains three values
+  # splt.candidates: the name of the candidate moderators
+  # Q: the within subgroup Q
+  # inx.pleaf: a logical vector indicate if a study belongs to this leaf
   Q <- node$Q
   splt.var <- node$splt.candidates
   inx.pleaf <- node$inx.leaf
@@ -45,7 +79,7 @@ FE.split <- function(y, vi, mods, mod.types, node){
         xk.rank <- rank(tapply(y, xk, mean))
         xk.ord <- xk.rank[as.character(xk)]
       }
-      temp <- FE.GS.cutoff(y, vi, xk.ord)
+      temp <- Find_Split_Point_FE(y, vi, xk.ord, minbucekt)
       if (is.null(temp)) {
         Dev.new <- -Inf
       } else {
@@ -103,7 +137,7 @@ maxD = 3
 
 for (j in 1:maxD) {
   for (i in 1:length(new.parents)) {
-  children <- FE.split(y, vi, mods, mod.types, new.parents[[i]])
+  children <- FE.split(y, vi, mods, mod.types, new.parents[[i]], minbucekt = 3)
   tree.frame <- rbind(tree.frame, children[["split"]])
   cpt <- do.call(c, list(cpt, children$cpt))
   offsprings <- do.call(c, list(offsprings, children$nodes))
@@ -153,7 +187,7 @@ for (k in splt.var){
       xk.rank <- rank(tapply(y[pleaf.inx], xk, mean))
       xk.ord <- xk.rank[as.character(xk)]
     }
-      temp <- FE.GS.cutoff(y, vi, xk.ord)
+      temp <- Find_Split_Point_FE(y, vi, xk.ord, minbucket)
       if (is.null(temp)) {
         Dev.new <- -Inf
       } else {

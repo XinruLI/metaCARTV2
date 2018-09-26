@@ -4,7 +4,7 @@
 \alias{REmrt}
 \title{Random effects meta-tree}
 \usage{
-REmrt(formula, data, vi, c = 1, maxL = 5L, minsplit = 5L, delQ = 1e-05,
+REmrt(formula, data, vi, c = 1, maxL = 5L, minsplit = 5L, cp = 1e-05,
   minbucket = 3, n.fold = 10, lookahead = FALSE, ...)
 }
 \arguments{
@@ -20,7 +20,7 @@ REmrt(formula, data, vi, c = 1, maxL = 5L, minsplit = 5L, delQ = 1e-05,
 
 \item{minsplit}{the minimum number of studies in a parent node before splitting}
 
-\item{delQ}{the stopping rule for the decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.}
+\item{cp}{the stopping rule for the decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.}
 
 \item{minbucket}{the minimum number of the studies in a terminal node}
 
