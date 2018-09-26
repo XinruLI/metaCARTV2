@@ -1,3 +1,5 @@
+# round the number for the $split in the returned tree frame
+
 #' Random effects meta-tree
 #'
 #'A function to fit a random effects meta-tree
@@ -9,7 +11,7 @@
 #' @param c A non-negative scalar.The pruning parameter to prune the initial tree by the "c*standard-error" rule.
 #' @param maxL the maximum number of splits
 #' @param minsplit the minimum number of studies in a parent node before splitting
-#' @param delQ the stopping rule for the decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.
+#' @param cp the stopping rule for the decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.
 #' @param n.fold the number of folds to perform the cross-validation
 #' @param minbucket the minimum number of the studies in a terminal node
 #' @param lookahead an argument indicating whether to apply the "look-ahead" strategy when fitting the tree
@@ -47,10 +49,11 @@
 #' @seealso \code{\link{summary.REmrt}}, \code{\link{plot.REmrt}}
 #' @export
 
-REmrt <- function(formula, data, vi, c = 1, maxL = 5L, minsplit = 5L, delQ = 1e-5, minbucket = 3, n.fold = 10, lookahead = FALSE, ...){
+REmrt <- function(formula, data, vi, c = 1, maxL = 5L, minsplit = 5L, cp = 1e-5, minbucket = 3, n.fold = 10, lookahead = FALSE, ...){
   Call <- match.call()
   indx <- match(c("formula", "data", "vi"),
                 names(Call), nomatch = 0L)
+#------  Check if all arguments are correctly specified  -------#  
   if (indx[1] == 0L)
     stop("a 'formula' argument is required")
   if (indx[3] == 0L)
@@ -62,12 +65,14 @@ REmrt <- function(formula, data, vi, c = 1, maxL = 5L, minsplit = 5L, delQ = 1e-
   temp <- Call[c(1L, indx)]
   temp[[1L]] <- quote(stats::model.frame)
   mf <- eval.parent(temp)
-  # use x-validation to decide the size of the tree
-  cv.res <- Xvalid_all(REmrt_GS_cpp2, mf, maxL = maxL, n.fold = n.fold, minbucket = minbucket, minsplit = minsplit, delQ = delQ, lookahead = lookahead)
+  
+#---    use x-validation to decide the size of the tree    ---#
+  cv.res <- Xvalid_all(REmrt_GS_cpp2, mf, maxL = maxL, n.fold = n.fold, minbucket = minbucket, minsplit = minsplit, cp = cp, lookahead = lookahead)
   mindex <- which.min(cv.res[, 1])
   cp.minse <- cv.res[mindex,1] + c*cv.res[mindex,2]
   cp.row <- min(which(cv.res[,1]<= cp.minse))
-  if (cp.row == 1) {
+  
+  if (cp.row == 1) {  # if no tree was detected
     warning("no moderator effect was detected")
     y <- model.response(mf)
     vi <- c(t(mf["(vi)"]))
@@ -88,34 +93,34 @@ REmrt <- function(formula, data, vi, c = 1, maxL = 5L, minsplit = 5L, delQ = 1e-
     ci.lb <- g - qnorm(0.975)*se
     ci.ub <- g + qnorm(0.975)*se
     
-    res <- list(n = n ,  Q = Q,
+    res.f <- list(n = n ,  Q = Q,
                 df = df, pval.Q = pval.Q, tau2 = tau2, g = g, se = se, zval = zval,
                 pval = pval, ci.lb = ci.lb, ci.ub = ci.ub, call = Call, data = mf, cv.res = cv.res)
-    res.f <- res
-  } else{
+  } else{  
     y <- model.response(mf)
     vi <- c(t(mf["(vi)"]))
-    res <- REmrt_GS_cpp2(mf, maxL = cp.row - 1, minsplit = minsplit, delQ = delQ, minbucket = minbucket, lookahead = lookahead)
-    depth <- nrow(res$tree)
-    tau2 <- res$tree$tau2[depth]
+    res <- REmrt_GS_cpp2(mf, maxL = maxL, minsplit = minsplit, cp = cp, minbucket = minbucket, lookahead = lookahead)
+    prunedTree <- res$tree[1:cp.row, ]
+    tau2 <- res$tree$tau2[cp.row]
     vi.star <- vi + tau2
-    subnodes <- c(t(res$node.split[ncol(res$node.split)]))
+    subnodes <- res$node.split[[cp.row]]
     wy.star <- y/vi.star
     n <- tapply(y, subnodes, length)
     g <- tapply(wy.star, subnodes, sum)/tapply(1/vi.star, subnodes, sum)
-    df <- depth - 1
-    Qb <- res$tree$Qb[depth]
+    df <- cp.row - 1
+    Qb <- res$tree$Qb[cp.row]
     pval.Qb <- pchisq(Qb, df, lower.tail = FALSE)
     se <- tapply(vi.star, subnodes, function(x) sqrt(1/sum(1/x)))
     zval <- g/se
     pval <- pnorm(abs(zval),lower.tail=FALSE)*2
     ci.lb <- g - qnorm(0.975)*se
     ci.ub <- g + qnorm(0.975)*se
-    mod.names <- unique(res$tree$mod[!is.na(res$tree$mod)])
+    mod.names <- unique(prunedTree$mod[!is.na(prunedTree$mod)])
     mf$term.node <- subnodes
-    res.f<- list(tree =  res$tree, n = n, moderators =  mod.names, Qb = Qb, tau2 = tau2, df = df, pval.Qb = pval.Qb,
+    res.f<- list(tree =  prunedTree, n = n, moderators =  mod.names, Qb = Qb, tau2 = tau2, df = df, pval.Qb = pval.Qb,
                  g = g, se = se, zval =zval, pval = pval, ci.lb = ci.lb,
-                 ci.ub = ci.ub, call = Call, cv.res = cv.res, data = mf, cpt = res$cpt)
+                 ci.ub = ci.ub, call = Call, cv.res = cv.res, cpt = res$cpt,
+                 data = mf, initial.tree = res$tree)
   }
   class(res.f) <- "REmrt"
   res.f

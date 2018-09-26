@@ -4,12 +4,12 @@
 #' @param maxL the maximum number of splits
 #' @param minbucket the minimum number of the studies in a terminal node
 #' @param minsplit the minimal number of studies in a parent node to be split
-#' @param delQ the stopping rule for decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.
+#' @param cp the stopping rule for decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.
 #' @param lookahead an argument indicating whether to apply the "look-ahead" strategy when fitting the tree
 #' @return a list including a tree, the split points, the data, and the nodes after each split
 #' @keywords internal
 #' @importFrom stats terms model.response
-REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
+REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, cp, lookahead){
   #===================  Error message  ======================#
   if (minbucket >= minsplit) {
     stop("minbucket should be smaller than minsplit")
@@ -165,7 +165,7 @@ REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
     Dev <- res.Qb[3]
     delta.Q <- res.Qb[3] - res.Qb[2]
     i = 2
-    while(delta.Q >= delQ & i < maxL) {
+    while(delta.Q >= cp & i < maxL) {
       i <- i+1
       TQb <- Ttau2 <- Tsplit <- Tmod <- Tpleaf <- NULL
       cnode <- nodemark[ ,i]
@@ -188,14 +188,14 @@ REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
             if (Dev.new > Dev) {
               Dev <- temp[2]
               c.star <- temp[1]
-              msplit <- paste(mods.names[k], "<=", c.star, collapse = " ")
+              msplit <- paste(mods.names[k], "<", c.star, collapse = " ")
               TQb = temp[2]
               Ttau2 = temp[3]
               Tsplit = msplit
               Tmod = mods.names[k]
               Tpleaf = as.numeric(pl)
               new.node <- cnode
-              new.node[pleaf.inx] <- ifelse( xk <= c.star, 2*i, 2*i+1)
+              new.node[pleaf.inx] <- ifelse( xk < c.star, 2*i, 2*i+1)
             }
           } else {
             xk.rank <- rank(tapply(y[pleaf.inx], xk, mean))
@@ -208,7 +208,7 @@ REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
             }
             if (Dev.new > Dev) {
               Dev <- temp[2]
-              c.star <- names(xk.rank[xk.rank <= temp[1]])
+              c.star <- names(xk.rank[xk.rank < temp[1]])
               msplit <- paste(mods.names[k], "=", paste(c.star, collapse = "/"), collapse = " ")
               TQb = temp[2]
               Ttau2 = temp[3]
@@ -216,7 +216,7 @@ REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
               Tmod = mods.names[k]
               Tpleaf = as.numeric(pl)
               new.node <- cnode
-              new.node[pleaf.inx] <- ifelse( xk.ordinal <= temp[1], 2*i, 2*i+1)
+              new.node[pleaf.inx] <- ifelse( xk.ordinal < temp[1], 2*i, 2*i+1)
             }
           }
         }
@@ -258,14 +258,14 @@ REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
             if (Dev.new > Dev) {
               Dev <- temp[2]
               c.star <- temp[1]
-              msplit <- paste(mods.names[k], "<=", c.star, collapse = " ")
+              msplit <- paste(mods.names[k], "<", c.star, collapse = " ")
               TQb = temp[2]
               Ttau2 = temp[3]
               Tsplit = msplit
               Tmod = mods.names[k]
               Tpleaf = as.numeric(pl)
               new.node <- cnode
-              new.node[pleaf.inx] <- ifelse( xk <= c.star, 2*i, 2*i+1)
+              new.node[pleaf.inx] <- ifelse( xk < c.star, 2*i, 2*i+1)
             }
           } else {
             xk.rank <- rank(tapply(y[pleaf.inx], xk, mean))
@@ -278,7 +278,7 @@ REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
             }
             if (Dev.new > Dev) {
               Dev <- temp[2]
-              c.star <- names(xk.rank[xk.rank <= temp[1]])
+              c.star <- names(xk.rank[xk.rank < temp[1]])
               msplit <- paste(mods.names[k], "=", paste(c.star, collapse = "/"), collapse = " ")
               TQb = temp[2]
               Ttau2 = temp[3]
@@ -286,7 +286,7 @@ REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
               Tmod = mods.names[k]
               Tpleaf = as.numeric(pl)
               new.node <- cnode
-              new.node[pleaf.inx] <- ifelse( xk.ordinal <= temp[1], 2*i, 2*i+1)
+              new.node[pleaf.inx] <- ifelse( xk.ordinal < temp[1], 2*i, 2*i+1)
             }
           }
         }
@@ -297,7 +297,7 @@ REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
         delta.Q <- abs(TQb - res.Qb[i])
       }
     }
-    while(delta.Q >= delQ & i <= maxL) {
+    while(delta.Q >= cp & i <= maxL) {
       nodemark <- cbind(nodemark, new.node)
       res.Qb <- c(res.Qb, TQb)
       res.tau2 <- c(res.tau2, Ttau2)
@@ -327,14 +327,14 @@ REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
             if (Dev.new > Dev) {
               Dev <- temp[2]
               c.star <- temp[1]
-              msplit <- paste(mods.names[k], "<=", c.star, collapse = " ")
+              msplit <- paste(mods.names[k], "<", c.star, collapse = " ")
               TQb = temp[2]
               Ttau2 = temp[3]
               Tsplit = msplit
               Tmod = mods.names[k]
               Tpleaf = as.numeric(pl)
               new.node <- cnode
-              new.node[pleaf.inx] <- ifelse( xk <= c.star, 2*i, 2*i+1)
+              new.node[pleaf.inx] <- ifelse( xk < c.star, 2*i, 2*i+1)
             }
           } else {
             xk.rank <- rank(tapply(y[pleaf.inx], xk, mean))
@@ -347,7 +347,7 @@ REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
             }
             if (Dev.new > Dev) {
               Dev <- temp[2]
-              c.star <- names(xk.rank[xk.rank <= temp[1]])
+              c.star <- names(xk.rank[xk.rank < temp[1]])
               msplit <- paste(mods.names[k], "=", paste(c.star, collapse = "/"), collapse = " ")
               TQb = temp[2]
               Ttau2 = temp[3]
@@ -355,7 +355,7 @@ REmrt_GS_cpp2 <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
               Tmod = mods.names[k]
               Tpleaf = as.numeric(pl)
               new.node <- cnode
-              new.node[pleaf.inx] <- ifelse( xk.ordinal <= temp[1], 2*i, 2*i+1)
+              new.node[pleaf.inx] <- ifelse( xk.ordinal < temp[1], 2*i, 2*i+1)
             }
           }
         }

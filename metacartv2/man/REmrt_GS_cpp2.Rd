@@ -4,7 +4,7 @@
 \alias{REmrt_GS_cpp2}
 \title{A function to fit the tree with look-ahead option}
 \usage{
-REmrt_GS_cpp2(mf, maxL, minbucket, minsplit, delQ, lookahead)
+REmrt_GS_cpp2(mf, maxL, minbucket, minsplit, cp, lookahead)
 }
 \arguments{
 \item{mf}{the data.frame to grow the tree}
@@ -15,7 +15,7 @@ REmrt_GS_cpp2(mf, maxL, minbucket, minsplit, delQ, lookahead)
 
 \item{minsplit}{the minimal number of studies in a parent node to be split}
 
-\item{delQ}{the stopping rule for decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.}
+\item{cp}{the stopping rule for decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.}
 
 \item{lookahead}{an argument indicating whether to apply the "look-ahead" strategy when fitting the tree}
 }

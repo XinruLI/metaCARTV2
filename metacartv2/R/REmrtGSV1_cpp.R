@@ -4,12 +4,12 @@
 #' @param maxL the maximum number of splits
 #' @param minbucket the minimum number of the studies in a terminal node
 #' @param minsplit the minimal number of studies in a parent node to be split
-#' @param delQ the stopping rule for decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.
+#' @param cp the stopping rule for decrease of between-subgroups Q. Any split that does not decrease the between-subgroups Q is not attempted.
 #' @param lookahead an argument indicating whether to apply the "look-ahead" strategy when fitting the tree
 #' @return a list including a tree, the split points, the data, and the nodes after each split
 #' @keywords internal
 #' @importFrom stats terms model.response
-REmrt_GS_cpp <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
+REmrt_GS_cpp <- function(mf, maxL, minbucket, minsplit, cp, lookahead){
   if(minbucket >= minsplit) stop("minbucket should be smaller than minsplit")
   y <- model.response(mf)
   vi <- c(t(mf["(vi)"]))
@@ -87,7 +87,7 @@ REmrt_GS_cpp <- function(mf, maxL, minbucket, minsplit, delQ, lookahead){
       delta.Q <- abs(TQb - res.Qb[i])
     }
   }
-  while(delta.Q >= delQ & i <= maxL) {
+  while(delta.Q >= cp & i <= maxL) {
     nodemark <- cbind(nodemark, new.node)
     res.Qb <- c(res.Qb, TQb)
     res.tau2 <- c(res.tau2, Ttau2)
