@@ -50,7 +50,7 @@ Xvalid_all <- function(func, mf, maxL, n.fold, minbucket, minsplit, cp, lookahea
     vi.train <- c(t(fit.train$data["(vi)"]))
     tau2 <- fit.train$tree$tau2
     nsplt <- nrow(fit.train$tree)
-    train.y <- ComputeY(fit.train$node.split, yi.train, vi.train,tau2) 
+    train.y <- ComputeY(fit.train$node.split, yi.train, vi.train, tau2) 
     test.nodes <- prednode_cpp(fit.train, test)
     test.y <- PredY(train.y, test.nodes)
     if (any(is.na(test.y))) {

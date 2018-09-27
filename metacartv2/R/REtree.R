@@ -90,10 +90,10 @@ REmrt <- function(formula, data, vi, c = 1, maxL = 5L, minsplit = 5L, cp = 1e-5,
     pval <- pnorm(abs(zval), lower.tail=FALSE)*2
     ci.lb <- g - qnorm(0.975)*se
     ci.ub <- g + qnorm(0.975)*se
-    
+    res <- REmrt_GS_(mf, maxL = maxL, minsplit = minsplit, cp = cp, minbucket = minbucket, lookahead = lookahead)
     res.f <- list(n = n ,  Q = Q,
                 df = df, pval.Q = pval.Q, tau2 = tau2, g = g, se = se, zval = zval,
-                pval = pval, ci.lb = ci.lb, ci.ub = ci.ub, call = Call, data = mf, cv.res = cv.res)
+                pval = pval, ci.lb = ci.lb, ci.ub = ci.ub, call = Call, data = mf, cv.res = cv.res, initial.tree = res$tree)
   } else{  
     y <- model.response(mf)
     vi <- c(t(mf["(vi)"]))

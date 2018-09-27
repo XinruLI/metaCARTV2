@@ -1,12 +1,12 @@
 Package: metacartv2
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
-Version: 1.02
+Title: Meta-CART: A Flexible Approach to Identify Moderators in Meta-Analysis
+Version: 2.01
 Date: 2018-05-16
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: One paragraph description of what the package does
-       as one or more full sentences.
+Author: Xinru Li [aut, cre], Elise Dusseldorp [aut, cph], Kaihua Liu [ctb] (supported with the plot function), Jacqueline Meulman [ctb]
+Maintainer: Xinru Li <x.li@math.leidenuniv.nl>
+Description: Fits meta-CART by integrating classification and regression trees (CART) into meta-analysis. Meta-CART is a flexible approach to identify interaction effects between moderators in meta-analysis. The methods are described in Dusseldorp et al. (2014) <doi:10.1037/hea0000018> and Li et al. (2017) <doi:10.1111/bmsp.12088>.
+LazyData: TRUE
 License: GPL (>= 2)
 Depends: R (>= 3.0.2), stats, ggplot2, gridExtra, methods, rpart
 Imports: Rcpp (>= 0.12.16)

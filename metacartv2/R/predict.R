@@ -13,16 +13,19 @@ predict.FEmrt <- function(object, newdata, ...){
     warning("calling predict.FEmrt(<fake-FEmrt-object>) ...")
   if (length(object$n) < 2) {
     warning("No tree was detected, all effect sizes are predicted as overall effect size")
-    data.frame(pred.y = rep(object$g, nrow(newdata)))
+    data.frame(g = rep(object$g, nrow(newdata)))
   } else {
     mf <- as.formula(object$call)
     tt <- terms(mf)
     ms <- model.frame(delete.response(tt), newdata)
     tree <- object$tree
     pred.efk <- predict(tree, newdata, type = "vector", ...)
-    inx <- match(pred.efk, predict(tree, type="vector"))
-    pred.node <- tree$where[inx]
-    data.frame(pred.y = pred.efk, ms, node = pred.node)
+    inx <- match(pred.efk, object$g)
+    ci.lb <- object$ci.lb[inx]
+    ci.ub <- object$ci.ub[inx]
+    res <- data.frame(g = pred.efk, ci.lb = ci.lb, ci.ub = ci.ub, ms)
+    row.names(res) <- NULL
+    res
   }
   
 }
@@ -41,5 +44,9 @@ predict.REmrt <- function(object, newdata, ...){
   allNodes <- prednode_cpp(object, newdata)
   TNodes <- allNodes[, ncol(allNodes)] 
   pred.g <- object$g[as.character(TNodes)]
-  cbind(newdata, TNodes, pred.g)
-}
+  ci.lb <- object$ci.lb[as.character(TNodes)]
+  ci.ub <- object$ci.ub[as.character(TNodes)]
+  res <- data.frame(g = pred.g, ci.lb = ci.lb, ci.ub = ci.ub, newdata)
+  row.names(res) <- NULL
+  res
+  }
