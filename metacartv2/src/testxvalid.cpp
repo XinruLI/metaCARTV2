@@ -1,4 +1,18 @@
 #include <Rcpp.h>
+#include <sstream>
+template <typename T>
+
+std::string to_string(T value)
+{
+  //create an output string stream
+  std::ostringstream os ;
+  
+  //throw the value into the string stream
+  os << value ;
+  
+  //convert the string stream into a string and return
+  return os.str() ;
+}
 using namespace Rcpp;
 
 
@@ -30,7 +44,7 @@ DataFrame ComputeY(DataFrame x1, NumericVector y,
         }
         
       }
-     swyNodes.push_back(sumWY/sumW, std::to_string(uniNodes[i]));
+     swyNodes.push_back(sumWY/sumW, to_string(uniNodes[i]));
       
     }
     
@@ -59,7 +73,7 @@ NumericMatrix PredY(List x1, IntegerMatrix x2) {
       if (tempB[j]) {
         res(j,i) = NA_REAL;
       } else {
-        res(j,i) = SubMeans[std::to_string(x2(j,i))];
+        res(j,i) = SubMeans[to_string(x2(j,i))];
       }
      
       //res(j,i) = x2(j,i);
@@ -92,10 +106,10 @@ NumericMatrix ReplaceNA(IntegerMatrix x1, NumericMatrix x2,
       temp1 = temp1 + y[ii]/(vi[ii] + tau2[jUni[jj]-1]);
       temp2 = temp2 + 1/(vi[ii] + tau2[jUni[jj]-1]);
     }
-    OverallWM.push_back(temp1/temp2, std::to_string(jUni[jj]));
+    OverallWM.push_back(temp1/temp2, to_string(jUni[jj]));
   }
   for (j = 0; j < x1.nrow(); j++) {
-  x2(x1(j,0)-1, x1(j,1)-1)  = OverallWM[std::to_string(x1(j,1))];
+  x2(x1(j,0)-1, x1(j,1)-1)  = OverallWM[to_string(x1(j,1))];
   }
   return x2;
   

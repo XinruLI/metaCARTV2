@@ -41,12 +41,19 @@ predict.FEmrt <- function(object, newdata, ...){
 #' @importFrom stats as.formula delete.response model.frame model.response terms predict
 #' @export
 predict.REmrt <- function(object, newdata, ...){
-  allNodes <- prednode_cpp(object, newdata)
-  TNodes <- allNodes[, ncol(allNodes)] 
-  pred.g <- object$g[as.character(TNodes)]
-  ci.lb <- object$ci.lb[as.character(TNodes)]
-  ci.ub <- object$ci.ub[as.character(TNodes)]
-  res <- data.frame(g = pred.g, ci.lb = ci.lb, ci.ub = ci.ub, newdata)
-  row.names(res) <- NULL
-  res
+  if (length(object$n) < 2) {
+    warning("No tree was detected, all effect sizes are predicted as overall effect size")
+    data.frame(g = rep(object$g, nrow(newdata)))
+  } else {
+    allNodes <- prednode_cpp(object, newdata)
+    TNodes <- allNodes[, ncol(allNodes)] 
+    pred.g <- object$g[as.character(TNodes)]
+    ci.lb <- object$ci.lb[as.character(TNodes)]
+    ci.ub <- object$ci.ub[as.character(TNodes)]
+    res <- data.frame(g = pred.g, ci.lb = ci.lb, ci.ub = ci.ub, newdata)
+    row.names(res) <- NULL
+    res
+    
+  }
+
   }
