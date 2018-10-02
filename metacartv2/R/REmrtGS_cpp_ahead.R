@@ -207,6 +207,7 @@ REmrt_GS_ <- function(mf, maxL, minbucket, minsplit, cp, lookahead){
         nodemark <- cbind(nodemark, new.node)
         res.Qb <- c(res.Qb, TQb)
         res.tau2 <- c(res.tau2, Ttau2)
+        res.tau2 <- pmax(0, res.tau2)
         res.split <- c(res.split, Tsplit)
         res.mod <- c(res.mod,Tmod)
         res.pleaf <- c(res.pleaf, Tpleaf)
