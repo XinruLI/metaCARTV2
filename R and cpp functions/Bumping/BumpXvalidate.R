@@ -1,5 +1,9 @@
 load("BumpingTestData")
+library(metacartv2)
 compute_subgrp_es <- function(fit){
+  # given an initial tree model 
+  # compute the subgroup effect sizes
+  # add fit$g to the initial tree
   allNodes <- metacartv2::prednode_cpp(fit, fit$data)
   TNodes <- allNodes[, ncol(allNodes)] 
   depth <- nrow(fit$tree)
@@ -21,7 +25,7 @@ bump <- function(data, maxL, B = 50) {
   fitB <- list()
   K <- nrow(data)
   # put in the original data
-  fit.o <- metacartv2::REmrt_GS_cpp(data, maxL = maxL, minsplit = 5, minbucket = 3, delQ = 0.001 )
+  fit.o <- metacartv2::REmrt_GS_(data, maxL = maxL, minsplit = 5, minbucket = 3, cp = 0.001,lookahead = F )
   fit.o <- compute_subgrp_es(fit.o)
   nodes <- metacartv2::prednode_cpp(fit.o, data)[,nrow(fit.o$tree)]
   y <- fit.o$g[as.character(nodes)]
@@ -31,7 +35,7 @@ bump <- function(data, maxL, B = 50) {
   for (b in 2:B) {
     inx.b <- sample(1:K, K, replace = T)
     data.b <- data[inx.b, ]
-    fit.b <- metacartv2::REmrt_GS_cpp(data.b, maxL = maxL, minsplit = 5, minbucket = 3, delQ = 0.001 )
+    fit.b <- metacartv2::REmrt_GS_(data.b, maxL = maxL, minsplit = 5, minbucket = 3, cp = 0.001, lookahead = F)
     fit.b <- compute_subgrp_es(fit.b)
     nodes <- metacartv2::prednode_cpp(fit.b, data)[,nrow(fit.b$tree)]
     y <- as.vector(fit.b$g[as.character(nodes)])
@@ -41,11 +45,7 @@ bump <- function(data, maxL, B = 50) {
   inxmin <- which.min(mse)
   fitB[[inxmin]]
 }
-# Cross-validation
-data = datBump
-maxL  = 2
-n.fold = 10
-B = 20
+# bumpling nested in Cross-validation
 
 XerrorBump <- function(data, maxL, n.fold = 10, B = 50){
   N <- nrow(data)
@@ -66,8 +66,8 @@ XerrorBump <- function(data, maxL, n.fold = 10, B = 50){
     sqrt(sum(((y-predy)^2-mean((y-predy)^2))^2))/sum((y-mean(y))^2))
   
 }
-CrossBump <- function(data, maxL, n.fold, B){
-  res <- sapply(1:maxL, function(x) CrossValidWithBump(data = data, 
+XcrossNestingBump <- function(data, maxL, n.fold, B){
+  res <- sapply(1:maxL, function(x) XerrorBump(data = data, 
                                                        x, n.fold = n.fold, 
                                                        B = B))
   res <- cbind(1:maxL, t(res))
@@ -75,7 +75,46 @@ CrossBump <- function(data, maxL, n.fold, B){
   res
 
 }
-xres <- CrossBump(datBump, 8, 10, 30)
-transmute(as.data.frame(xres), plussd =  xerror + sd.xerror)
-L  = 5
-bump(datBump, 5, 50)$tree
+xres <- XcrossNestingBump(datBump, 5, 10, 25)
+library(dplyr)
+mutate(as.data.frame(xres),
+       within1SE = xerror <= min(xerror) + sd.xerror[which.min(xerror)])
+L  = 2
+bump(datBump, L, 50)$tree
+
+# cross-validation nested in bumping
+formula <- as.formula(efk ~ x1 + x2 + x3 + x4)
+data <- datBump
+data$vi <- datBump$`(vi)`
+maxL  = 5
+n.fold = 10
+B = 25
+BumpNestingXvalid <- function(formula, vi, data, maxL, n.fold, B){
+  mse <- numeric(B)
+  fitB <- list()
+  K <- nrow(data)
+  # original data
+  fit.o <- metacartv2::REmrt(formula = formula, vi = vi, n.fold = n.fold, 
+                    data = data, maxL = maxL)
+  y = predict(fit.o, data)[[1]]
+  mse[1] <- mean((y-model.response(data))^2)
+  fit.o$data <- NULL
+  fitB[[1]] <- fit.o
+  for (b in 2:B) {
+    inx.b <- sample(1:K, K, replace = T)
+    data.b <- data[inx.b, ]
+    fit.b <- metacartv2::REmrt(formula = formula, vi = vi, n.fold = n.fold, 
+                               data = data.b, maxL = maxL)
+    y <- predict(fit.b, data)[[1]]
+    mse[b] <- mean((y-model.response(data))^2)
+    fit.b$data <- NULL
+    fitB[[b]] <- fit.b
+  }
+  inxmin <- which.min(mse)
+  fitB[[inxmin]]
+}
+
+datBump$vi <- datBump$`(vi)`
+res <- BumpNestingXvalid(efk ~ x1 + x2 + x3 + x4, vi = vi, data = datBump,
+                         maxL  = 5, n.fold = 10, B = 25)
+res

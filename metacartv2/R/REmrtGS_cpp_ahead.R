@@ -201,16 +201,16 @@ REmrt_GS_ <- function(mf, maxL, minbucket, minsplit, cp, lookahead){
           }
         }
       }
-      nodemark <- cbind(nodemark, new.node)
-      res.Qb <- c(res.Qb, TQb)
-      res.tau2 <- c(res.tau2, Ttau2)
-      res.split <- c(res.split, Tsplit)
-      res.mod <- c(res.mod,Tmod)
-      res.pleaf <- c(res.pleaf, Tpleaf)
-      cpt[[i]] <- c.star
       if (is.null(TQb)) { 
         delta.Q <- -Inf
       } else {
+        nodemark <- cbind(nodemark, new.node)
+        res.Qb <- c(res.Qb, TQb)
+        res.tau2 <- c(res.tau2, Ttau2)
+        res.split <- c(res.split, Tsplit)
+        res.mod <- c(res.mod,Tmod)
+        res.pleaf <- c(res.pleaf, Tpleaf)
+        cpt[[i]] <- c.star
         delta.Q <- abs(TQb - res.Qb[i])
       }
       
