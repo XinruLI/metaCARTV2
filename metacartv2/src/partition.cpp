@@ -1,12 +1,9 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-//' Test if x1 contains the first element of x2 
-//' 
-//' @param x1 a charactor vector
-//' @param x2 a charactor vector
-// [[Rcpp::export]]
+
 bool contain_(CharacterVector x1, CharacterVector x2){
+  // Test if x1 contains the first element of x2 
   return std::find(x1.begin(), x1.end(), x2[0]) != x1.end();
 }
 
@@ -19,7 +16,8 @@ bool contain_(CharacterVector x1, CharacterVector x2){
 //' @param x4 the index vector of the spliting moderators
 //' @param x5 the list of split points
 //' @param x6 the moderators in the training set
-// [[Rcpp::export]]
+//' @keywords internal
+// [[Rcpp::export(".partition")]]
 IntegerMatrix partition(DataFrame x1, DataFrame x2, 
                     LogicalVector x3, IntegerVector x4,
                     List x5, DataFrame x6) {

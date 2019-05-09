@@ -1,5 +1,3 @@
-#' Summary function for metacart
-#'
 #' Summary of the results of a FE meta-tree object
 #'
 #' @param object fitted tree of class \code{FEmrt}.
@@ -8,8 +6,8 @@
 #' @details If no moderator effect is detected,
 #' the summary function will show the standard meta-analysis results.
 #' Otherwise, the summary function will show the subgroup meta-analysis results,
-#' with the significance test resutls for moderator effects, the splitting points of the moderators,
-#' and the estimated subgroup overall effect sizes.
+#' with the significance test results for moderator effects, the split points of the moderators,
+#' and the estimated subgroup summary effect sizes.
 #' @importFrom stats symnum
 #' @export
 summary.FEmrt <- function(object, digits = 3, ...){
@@ -85,8 +83,8 @@ summary.FEmrt <- function(object, digits = 3, ...){
 #' @details If no moderator effect is detected,
 #' the summary function will show the standard meta-analysis results.
 #' Otherwise, the summary function will show the subgroup meta-analysis results,
-#' with the significance test resutls for moderator effects, the splitting points of the moderators,
-#' and the estimated subgroup overall effect sizes.
+#' with the significance test results for moderator effects, the split points of the moderators,
+#' and the estimated subgroup summary effect sizes.
 #' @importFrom stats symnum
 #' @export
 summary.REmrt <- function(object, digits = 3, ...){

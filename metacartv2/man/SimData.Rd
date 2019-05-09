@@ -3,22 +3,21 @@
 \docType{data}
 \name{SimData}
 \alias{SimData}
-\alias{dat.balanced}
-\title{A simulated meta-analytic data set with balanced pure interaction effects}
-\format{A data frame of 60 studies with 4 moderators
+\title{A simulated meta-analytic data set}
+\format{A data frame of 120 studies with 5 moderators
 \itemize{
   \item efk: The effect size of each study expressed as Hedges' g
   \item vark: The sampling variance of the effect size
-  \item x1 to x4: Four randomly generated moderators. x1, x2, and x4 are dichotomous variables,
-  x3 is a continous variable generated from uniform distribution.
+  \item m1 to m5: Five randomly generated moderators. m1 and m2 have two levels (A and B),
+  whereas m3, m4 and m5 have three levels (A, B and C)
   }}
 \usage{
-data(dat.balanced)
+data(SimData)
 }
 \description{
-Data simuated from a true model with two two-way interactions between three
-moderators: x1, x2. If x1 = 0 and x2 = 1 or x1 = 1 and x2 = 0, 
-the true effect size will be 0.50. Otherwise, the true effect size is 0.
+Data simuated from a true model with a three-way interaction between three
+moderators: m1, m2 and m3. If the values of the three moderators are all "B"s
+the true effect size will be 0.80. Otherwise, the true effect size is 0.
 }
 \keyword{datasets}
 \keyword{simulated}

@@ -22,7 +22,8 @@ using namespace Rcpp;
 //' @param y  the effect size
 //' @param vi the sampling variance
 //' @param tau2 the residual heterogeneity
-// [[Rcpp::export]]
+//' @keywords internal
+// [[Rcpp::export(".ComputeY")]]
 DataFrame ComputeY(DataFrame x1, NumericVector y,
                 NumericVector vi, NumericVector tau2) {
   int nsplit;
@@ -59,7 +60,8 @@ DataFrame ComputeY(DataFrame x1, NumericVector y,
 //' 
 //' @param x1 the list of subgroup means
 //' @param x2 predicted subgroup membership for the test set
-// [[Rcpp::export]]
+//' @keywords internal
+// [[Rcpp::export(".PredY")]]
 NumericMatrix PredY(List x1, IntegerMatrix x2) {
   //x1 is the list of subgroup means
   //x2 is predicted subgroup membership for the test set
@@ -90,7 +92,8 @@ NumericMatrix PredY(List x1, IntegerMatrix x2) {
 //' @param y  the effect size
 //' @param vi the sampling variance
 //' @param tau2 the residual heterogeneity
-// [[Rcpp::export]]
+//' @keywords internal
+// [[Rcpp::export(".ReplaceNA")]]
 NumericMatrix ReplaceNA(IntegerMatrix x1, NumericMatrix x2,
                         NumericVector y, NumericVector vi,
                         NumericVector tau2){

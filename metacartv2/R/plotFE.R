@@ -12,6 +12,9 @@
 #' @import gridExtra
 #' @export
 plot.FEmrt <- function(x, ...){
+  if (length(x$n) < 2) {
+    warning("No tree was detected")
+  } else{
   # Extract necessary information from the FEmrt object
 
   frame <- x$tree$frame
@@ -254,13 +257,6 @@ plot.FEmrt <- function(x, ...){
       p <- CI_draw(p, x = x.coord2, y = y.coord2, b = 1.96* x$se[trans.labels[i]], a = 1.96* x$se[trans.labels[i]]/CI.ratio)
 
     }
-
-
-    # for (i in unique(term.nodes)) {
-    #   b = 1.96* x$se[i]
-    #   a = b/CI.ratio
-    #   p <- CI_draw(p, x = nodes[i, ]$x , y = frame0[i,]$yval, a = a, b = b)
-    # }
     p <- p + transparent_theme2
     # Finally put two plots together
     # X:    ggplotGrob + annotation_custom
@@ -272,7 +268,7 @@ plot.FEmrt <- function(x, ...){
 
 
   }
-
+  }
 
 }
 

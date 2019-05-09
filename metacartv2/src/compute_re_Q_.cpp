@@ -10,7 +10,8 @@ using namespace Rcpp;
 //' @param x5 the effect size g in the parent leaf
 //' @param x6 the sampling variance vi in the parent leaf
 //' @param xuni the unique labels in the unsplit leaves
-// [[Rcpp::export]]
+//' @keywords internal
+// [[Rcpp::export(".compute_re_Q_")]]
 NumericVector compute_re_Q_(NumericVector x1,NumericVector x2, 
                                NumericVector x3,NumericVector x4,
                                NumericVector xuni,

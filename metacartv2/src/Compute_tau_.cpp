@@ -9,7 +9,8 @@ using namespace Rcpp;
 //' @param x4 the sorted effect size in the parent leaf
 //' @param x5 the sorted sampling variance in the parent leaf
 //' @param xuni the unique labels in the unsplit leaves
-// [[Rcpp::export]]
+//' @keywords internal
+// [[Rcpp::export(".compute_tau_")]]
 NumericVector compute_tau_(NumericVector x1,NumericVector x2, 
                              NumericVector x3, NumericVector xuni,
                              NumericVector x4, NumericVector x5){
